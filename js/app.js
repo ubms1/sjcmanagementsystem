@@ -27,6 +27,9 @@ const App = {
         this.navigate('dashboard');
         this.updateProfileUI();
 
+        // Start notifications system
+        if (typeof Notifications !== 'undefined') Notifications.init();
+
         // Auto-save
         setInterval(() => Database.save(), 30000);
     },
