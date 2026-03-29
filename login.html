@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJC Group — Business Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="portal-page">
+    <div class="portal-wrap">
+
+        <!-- Header -->
+        <div class="portal-header">
+            <div class="portal-logos">
+                <img src="San Jacinto Construction/SJC logo.jpg" alt="SJC" class="logo-round" title="San Jacinto Construction" onerror="this.style.display='none'">
+                <img src="Mileage Development & Training Center Inc/MDTCI logo.jpg" alt="MDTCI" class="logo-round" title="Mileage Development & Training Center" onerror="this.style.display='none'">
+                <img src="Megatesting Center Inc.-Tuguegarao Branch/MEGASTESTING logo.jpg" alt="Megatesting" class="logo-round" title="Megatesting Center Inc." onerror="this.style.display='none'">
+            </div>
+            <h1 class="portal-title">SJC Group of Companies</h1>
+            <p class="portal-subtitle">Unified Business Management System</p>
+        </div>
+
+        <p class="portal-prompt">Select your business portal to continue</p>
+
+        <!-- Business Portal Cards -->
+        <div class="portal-grid">
+
+            <!-- SJC Construction -->
+            <a href="login-sjc.html" class="portal-card portal-card-sjc">
+                <div class="portal-card-header">
+                    <img src="San Jacinto Construction/SJC logo.jpg" alt="SJC" class="portal-card-logo"
+                         onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="portal-logo-fallback">SJC</div>
+                </div>
+                <div class="portal-card-body">
+                    <div class="portal-card-name">San Jacinto Construction</div>
+                    <div class="portal-card-desc">Construction &bull; Subdivision &bull; Aggregates &bull; Commercial Spaces</div>
+                    <span class="portal-card-enter">Manager Login <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Mileage / MDTCI -->
+            <a href="login-mdtci.html" class="portal-card portal-card-mileage">
+                <div class="portal-card-header">
+                    <img src="Mileage Development & Training Center Inc/MDTCI logo.jpg" alt="MDTCI" class="portal-card-logo"
+                         onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="portal-logo-fallback">MDTCI</div>
+                </div>
+                <div class="portal-card-body">
+                    <div class="portal-card-name">Mileage Dev. &amp; Training Center Inc.</div>
+                    <div class="portal-card-desc">Driving School &bull; LTO Accredited &bull; Professional Driver Training</div>
+                    <span class="portal-card-enter">Manager Login <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Megatesting -->
+            <a href="login-megatesting.html" class="portal-card portal-card-megatesting">
+                <div class="portal-card-header">
+                    <img src="Megatesting Center Inc.-Tuguegarao Branch/MEGASTESTING logo.jpg" alt="Megatesting" class="portal-card-logo"
+                         onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="portal-logo-fallback">MT</div>
+                </div>
+                <div class="portal-card-body">
+                    <div class="portal-card-name">Megatesting Center Inc.</div>
+                    <div class="portal-card-desc">Materials Testing &bull; DPWH Accredited &bull; Tuguegarao Branch</div>
+                    <span class="portal-card-enter">Manager Login <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- System Administrator Access -->
+        <div class="portal-admin-wrap">
+            <button class="portal-admin-btn" onclick="toggleAdmin()" type="button">
+                <i class="fas fa-user-shield"></i> System Administrator Access
+            </button>
+            <div id="adminPanel" class="portal-admin-panel sa-form-hidden">
+                <form onsubmit="handleAdminLogin(event)">
+                    <div id="adminError" class="login-error hidden"></div>
+                    <div class="form-group">
+                        <label for="saCode"><i class="fas fa-key"></i> SuperAdmin Access Code</label>
+                        <input type="password" id="saCode" class="form-input" placeholder="Enter access code" autocomplete="off" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block">
+                        <i class="fas fa-unlock-alt"></i> SuperAdmin Login
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="portal-footer">&copy; 2025 SJC Group of Companies. All rights reserved.</div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        Database.init();
+        const _session = JSON.parse(localStorage.getItem('sjc_ubms_session'));
+        if (_session && _session.isLoggedIn) window.location.href = 'index.html';
+
+        function toggleAdmin() {
+            document.getElementById('adminPanel').classList.toggle('sa-form-hidden');
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const code  = document.getElementById('saCode').value.trim();
+            const errEl = document.getElementById('adminError');
+            const btn   = e.target.querySelector('button[type="submit"]');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…'; }
+            const result = await Auth.loginSuperAdmin(code);
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock-alt"></i> SuperAdmin Login'; }
+            if (result.success) {
+                window.location.href = 'index.html';
+            } else {
+                errEl.textContent = result.error || 'Invalid access code.';
+                errEl.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

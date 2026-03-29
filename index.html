@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJC Unified Business Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="App.closeSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <img id="sidebarLogo" src="San Jacinto Construction/SJC logo.jpg" alt="SJC Group" class="logo-round sidebar-logo">
+                <div>
+                    <div id="sidebarBrandTitle" class="sidebar-brand-title">SJC UBMS</div>
+                    <div id="sidebarBrandSubtitle" class="sidebar-brand-subtitle">Unified Business System</div>
+                </div>
+            </div>
+            <button id="sidebarCollapseBtn" class="sidebar-collapse-btn" title="Collapse / Expand sidebar"><i class="fas fa-chevron-left"></i></button>
+        </div>
+
+        <!-- Company Selector -->
+        <div class="sidebar-company-selector">
+            <select id="activeCompany" class="company-select" title="Select active company">
+                <option value="all">All Companies (Group)</option>
+                <optgroup label="San Jacinto Construction Group">
+                    <option value="sjc">San Jacinto Construction</option>
+                    <option value="erlandia">Erlandia Homes Subdivision</option>
+                    <option value="nancys">Nancy's Square Commercial</option>
+                    <option value="crushing">Stationary Crushing Plant</option>
+                </optgroup>
+                <optgroup label="Mileage Development">
+                    <option value="mileage">Mileage Dev't & Training Center</option>
+                </optgroup>
+                <optgroup label="Megatesting Center">
+                    <option value="megatesting">Megatesting Center Inc.</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- CORE -->
+            <div class="nav-group">
+                <div class="nav-group-title"><i class="fas fa-th-large"></i> Core</div>
+                <a href="#" class="nav-link active" data-module="dashboard"><i class="fas fa-tachometer-alt nav-icon"></i><span class="nav-text">Dashboard</span></a>
+                <a href="#" class="nav-link" data-module="crm"><i class="fas fa-users nav-icon"></i><span class="nav-text">CRM</span></a>
+                <a href="#" class="nav-link" data-module="financial"><i class="fas fa-chart-bar nav-icon"></i><span class="nav-text">Financial</span></a>
+                <a href="#" class="nav-link" data-module="reports"><i class="fas fa-file-alt nav-icon"></i><span class="nav-text">Reports</span></a>
+                <a href="#" class="nav-link" data-module="financial-analysis"><i class="fas fa-chart-pie nav-icon"></i><span class="nav-text">Financial Analysis</span></a>
+            </div>
+
+            <!-- CONSTRUCTION HUB -->
+            <div class="nav-group" id="nav-construction">
+                <div class="nav-group-title"><i class="fas fa-hard-hat"></i> Construction Hub</div>
+                <a href="#" class="nav-link" data-module="projects"><i class="fas fa-project-diagram nav-icon"></i><span class="nav-text">Projects</span></a>
+                <a href="#" class="nav-link" data-module="project-monitoring"><i class="fas fa-tasks nav-icon"></i><span class="nav-text">Project Monitoring</span></a>
+                <a href="#" class="nav-link" data-module="job-costing"><i class="fas fa-calculator nav-icon"></i><span class="nav-text">Job Costing</span></a>
+                <a href="#" class="nav-link" data-module="subcontractors"><i class="fas fa-people-carry nav-icon"></i><span class="nav-text">Subcontractors</span></a>
+                <a href="#" class="nav-link" data-module="equipment"><i class="fas fa-truck-monster nav-icon"></i><span class="nav-text">Equipment &amp; Fleet</span></a>
+                <a href="#" class="nav-link" data-module="safety"><i class="fas fa-shield-alt nav-icon"></i><span class="nav-text">Safety / QHSE</span></a>
+                <a href="#" class="nav-link" data-module="documents"><i class="fas fa-folder-open nav-icon"></i><span class="nav-text">Documents</span></a>
+                <a href="#" class="nav-link" data-module="credit-collection"><i class="fas fa-hand-holding-usd nav-icon"></i><span class="nav-text">Credit &amp; Collection</span></a>
+            </div>
+
+            <!-- SUBDIVISION HUB -->
+            <div class="nav-group" id="nav-subdivision">
+                <div class="nav-group-title"><i class="fas fa-home"></i> Subdivision Hub</div>
+                <a href="#" class="nav-link" data-module="lots"><i class="fas fa-map nav-icon"></i><span class="nav-text">Lot Management</span></a>
+                <a href="#" class="nav-link" data-module="homeowners"><i class="fas fa-user-friends nav-icon"></i><span class="nav-text">Homeowners</span></a>
+                <a href="#" class="nav-link" data-module="lot-payments"><i class="fas fa-money-check-alt nav-icon"></i><span class="nav-text">Payments</span></a>
+                <a href="#" class="nav-link" data-module="amenities"><i class="fas fa-swimming-pool nav-icon"></i><span class="nav-text">Amenities</span></a>
+            </div>
+
+            <!-- COMMERCIAL HUB -->
+            <div class="nav-group" id="nav-commercial">
+                <div class="nav-group-title"><i class="fas fa-store"></i> Commercial Hub</div>
+                <a href="#" class="nav-link" data-module="spaces"><i class="fas fa-door-open nav-icon"></i><span class="nav-text">Spaces</span></a>
+                <a href="#" class="nav-link" data-module="tenants"><i class="fas fa-id-badge nav-icon"></i><span class="nav-text">Tenants</span></a>
+                <a href="#" class="nav-link" data-module="leases"><i class="fas fa-file-contract nav-icon"></i><span class="nav-text">Leases</span></a>
+                <a href="#" class="nav-link" data-module="rental-payments"><i class="fas fa-cash-register nav-icon"></i><span class="nav-text">Rental Payments</span></a>
+            </div>
+
+            <!-- QUARRY HUB -->
+            <div class="nav-group" id="nav-quarry">
+                <div class="nav-group-title"><i class="fas fa-mountain"></i> Quarry Hub</div>
+                <a href="#" class="nav-link" data-module="quarry-products"><i class="fas fa-cubes nav-icon"></i><span class="nav-text">Products</span></a>
+                <a href="#" class="nav-link" data-module="quarry-orders"><i class="fas fa-clipboard-list nav-icon"></i><span class="nav-text">Orders</span></a>
+                <a href="#" class="nav-link" data-module="quarry-deliveries"><i class="fas fa-truck nav-icon"></i><span class="nav-text">Deliveries</span></a>
+                <a href="#" class="nav-link" data-module="quarry-production"><i class="fas fa-industry nav-icon"></i><span class="nav-text">Production</span></a>
+            </div>
+
+            <!-- DRIVING SCHOOL HUB -->
+            <div class="nav-group" id="nav-driving">
+                <div class="nav-group-title"><i class="fas fa-car"></i> Driving School Hub</div>
+                <a href="#" class="nav-link" data-module="courses"><i class="fas fa-book nav-icon"></i><span class="nav-text">Courses</span></a>
+                <a href="#" class="nav-link" data-module="students"><i class="fas fa-user-graduate nav-icon"></i><span class="nav-text">Students</span></a>
+                <a href="#" class="nav-link" data-module="enrollments"><i class="fas fa-clipboard-check nav-icon"></i><span class="nav-text">Enrollments</span></a>
+                <a href="#" class="nav-link" data-module="instructors"><i class="fas fa-chalkboard-teacher nav-icon"></i><span class="nav-text">Instructors</span></a>
+                <a href="#" class="nav-link" data-module="vehicles"><i class="fas fa-bus nav-icon"></i><span class="nav-text">Vehicles</span></a>
+                <a href="#" class="nav-link" data-module="schedules"><i class="fas fa-calendar-alt nav-icon"></i><span class="nav-text">Schedules</span></a>
+                <a href="#" class="nav-link" data-module="certificates"><i class="fas fa-certificate nav-icon"></i><span class="nav-text">Certificates</span></a>
+            </div>
+
+            <!-- TESTING LAB HUB -->
+            <div class="nav-group" id="nav-testing">
+                <div class="nav-group-title"><i class="fas fa-flask"></i> Testing Lab Hub</div>
+                <a href="#" class="nav-link" data-module="test-services"><i class="fas fa-vials nav-icon"></i><span class="nav-text">Test Services</span></a>
+                <a href="#" class="nav-link" data-module="test-orders"><i class="fas fa-file-medical nav-icon"></i><span class="nav-text">Test Orders</span></a>
+                <a href="#" class="nav-link" data-module="test-samples"><i class="fas fa-microscope nav-icon"></i><span class="nav-text">Samples</span></a>
+                <a href="#" class="nav-link" data-module="test-results"><i class="fas fa-poll nav-icon"></i><span class="nav-text">Results</span></a>
+                <a href="#" class="nav-link" data-module="lab-equipment"><i class="fas fa-tools nav-icon"></i><span class="nav-text">Lab Equipment</span></a>
+                <a href="#" class="nav-link" data-module="quality-reviews"><i class="fas fa-award nav-icon"></i><span class="nav-text">Quality Reviews</span></a>
+            </div>
+
+            <!-- BUSINESS TOOLS -->
+            <div class="nav-group">
+                <div class="nav-group-title"><i class="fas fa-toolbox"></i> Business Tools</div>
+                <a href="#" class="nav-link" data-module="invoicing"><i class="fas fa-file-invoice nav-icon"></i><span class="nav-text">Invoicing</span></a>
+                <a href="#" class="nav-link" data-module="payroll"><i class="fas fa-wallet nav-icon"></i><span class="nav-text">Payroll</span></a>
+                <a href="#" class="nav-link" data-module="inventory"><i class="fas fa-boxes nav-icon"></i><span class="nav-text">Inventory</span></a>
+                <a href="#" class="nav-link" data-module="pos"><i class="fas fa-cash-register nav-icon"></i><span class="nav-text">Point of Sale</span></a>
+                <a href="#" class="nav-link" data-module="iso"><i class="fas fa-certificate nav-icon"></i><span class="nav-text">ISO Management</span></a>
+            </div>
+
+            <!-- ADMIN -->
+            <div class="nav-group">
+                <div class="nav-group-title"><i class="fas fa-cogs"></i> Administration</div>
+                <a href="#" class="nav-link" data-module="admin"><i class="fas fa-user-shield nav-icon"></i><span class="nav-text">Admin Panel</span></a>
+                <a href="#" class="nav-link" data-module="settings"><i class="fas fa-sliders-h nav-icon"></i><span class="nav-text">Settings</span></a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-version">SJC UBMS v1.0 &copy; 2025</div>
+        </div>
+    </aside>
+
+    <!-- Main Area -->
+    <div class="main-wrapper">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button id="sidebarToggle" class="topbar-toggle" title="Toggle sidebar"><i class="fas fa-bars"></i></button>
+                <h1 id="pageTitle" class="topbar-title">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search..." id="globalSearch">
+                </div>
+                <button class="topbar-icon-btn" title="Notifications"><i class="fas fa-bell"></i><span class="notification-badge">3</span></button>
+                <div class="profile-dropdown">
+                    <button id="profileBtn" class="profile-btn">
+                        <div class="avatar"><i class="fas fa-user"></i></div>
+                        <div class="profile-info">
+                            <span id="profileName">User</span>
+                            <span id="profileRole" class="profile-role">Role</span>
+                        </div>
+                        <i class="fas fa-chevron-down profile-chevron"></i>
+                    </button>
+                    <div id="profileMenu" class="profile-menu">
+                        <a href="#" onclick="App.navigate('settings');return false"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" onclick="App.logout();return false"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="main-content">
+            <div class="loading-container">
+                <i class="fas fa-spinner fa-spin fa-2x loading-spinner"></i>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Firebase SDK (must load before db.js) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/construction.js"></script>
+    <script src="js/subdivision.js"></script>
+    <script src="js/commercial.js"></script>
+    <script src="js/crushing.js"></script>
+    <script src="js/driving.js"></script>
+    <script src="js/testing.js"></script>
+    <script src="js/crm.js"></script>
+    <script src="js/financial.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/financialanalysis.js"></script>
+    <script src="js/invoicing.js"></script>
+    <script src="js/payroll.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/pos.js"></script>
+    <script src="js/iso.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/excel.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
