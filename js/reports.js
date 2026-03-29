@@ -36,12 +36,24 @@ const Reports = {
     renderRevenue(c) {
         const companies = Object.values(DataStore.companies);
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const invoices = DataStore.invoices || [];
+
+        // Compute monthly paid revenue per company from actual invoices
+        const computeMonthly = (coId) => {
+            const arr = new Array(12).fill(0);
+            invoices.filter(i => (i.companyId || i.company) === coId && i.status === 'paid').forEach(i => {
+                const m = new Date(i.date || i.createdAt || 0).getMonth();
+                if (m >= 0 && m < 12) arr[m] += (i.amount || 0);
+            });
+            return arr;
+        };
+
         c.innerHTML = `
         <div class="card mb-3"><div class="card-body"><h3 class="mb-2">Monthly Revenue by Company</h3><div class="chart-container"><canvas id="revReportChart"></canvas></div></div></div>
         <div class="card"><div class="card-body no-padding">
             <div class="table-wrapper"><table class="table"><thead><tr><th>Company</th>${months.map(m=>`<th>${m}</th>`).join('')}<th>Total</th></tr></thead><tbody>
             ${companies.map(co => {
-                const rev = (DataStore.monthlyRevenue || {})[co.id] || new Array(12).fill(0);
+                const rev = computeMonthly(co.id);
                 const total = rev.reduce((a,b)=>a+b,0);
                 return `<tr><td><strong>${Utils.escapeHtml(co.name)}</strong></td>${rev.map(v=>`<td>${Utils.formatNumber(v)}</td>`).join('')}<td><strong>${Utils.formatCurrency(total)}</strong></td></tr>`;
             }).join('')}
@@ -51,7 +63,7 @@ const Reports = {
         if (typeof Chart !== 'undefined') {
             const ctx = document.getElementById('revReportChart');
             if (ctx) new Chart(ctx, { type: 'bar', data: { labels: months, datasets: companies.map(co => ({
-                label: co.name, data: (DataStore.monthlyRevenue || {})[co.id] || new Array(12).fill(0),
+                label: co.name, data: computeMonthly(co.id),
                 backgroundColor: co.color + '90', borderColor: co.color, borderWidth: 1
             }))}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }}, scales: { y: { beginAtZero: true }}}});
         }
@@ -116,7 +128,7 @@ const Reports = {
         <div class="grid-3">
             ${companies.map(co => {
                 const summary = DataStore.getCompanySummary(co.id);
-                const rev = ((DataStore.monthlyRevenue || {})[co.id] || []).reduce((a,b) => a+b, 0);
+                const rev = (DataStore.invoices || []).filter(i => (i.companyId || i.company) === co.id && i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0);
                 return `
                 <div class="card" data-company="${co.id}"><div class="card-body">
                     <div class="co-summary-header">

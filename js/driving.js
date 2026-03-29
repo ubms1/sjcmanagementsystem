@@ -160,14 +160,34 @@ const DrivingSchool = {
         const studentId = document.getElementById('enStudent')?.value;
         const courseId = document.getElementById('enCourse')?.value;
         if (!studentId || !courseId) { App.showToast('Student and course required', 'error'); return; }
+        const amountPaid = parseFloat(document.getElementById('enAmount')?.value) || 0;
+        const enrollDate = document.getElementById('enDate')?.value || new Date().toISOString().split('T')[0];
         DataStore.enrollments.push({
             id: Utils.generateId('ENR'),
             studentId, courseId,
             instructorId: document.getElementById('enInstructor')?.value || '',
-            amountPaid: parseFloat(document.getElementById('enAmount')?.value) || 0,
-            dateEnrolled: document.getElementById('enDate')?.value || new Date().toISOString().split('T')[0],
+            amountPaid,
+            dateEnrolled: enrollDate,
             status: 'enrolled'
         });
+        // Auto-create invoice for enrollment fee
+        const student = DataStore.students.find(s => s.id === studentId);
+        const course = DataStore.drivingCourses.find(c => c.id === courseId);
+        if (student && amountPaid > 0) {
+            const desc = course ? `Enrollment — ${course.name}` : 'Driving School Enrollment';
+            DataStore.invoices.push({
+                id: Utils.generateId('INV'),
+                companyId: 'mileage',
+                client: student.name,
+                address: student.address || '',
+                items: [{ description: desc, qty: 1, price: amountPaid, amount: amountPaid }],
+                amount: amountPaid,
+                status: 'unpaid',
+                date: enrollDate,
+                dueDate: enrollDate,
+                createdAt: new Date().toISOString()
+            });
+        }
         Database.save(); App.closeModal(); App.showToast('Student enrolled');
         this.renderEnrollments(document.getElementById('mainContent'));
     },

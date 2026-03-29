@@ -2320,7 +2320,7 @@ td .btn-sm i { font-size: 12px; }
 }
 
 /* Tab bar for catalog (reusable) */
-.tab-bar {
+.tab-bar, .tabs {
     display: flex;
     gap: 4px;
     flex-wrap: wrap;

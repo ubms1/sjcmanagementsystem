@@ -72,6 +72,7 @@ const Commercial = {
     editSpace(id) {
         const s = DataStore.commercialSpaces.find(x => x.id === id);
         if (!s) return;
+        const tenantOpts = DataStore.tenants.map(t=>`<option value="${Utils.escapeHtml(t.businessName)}" ${s.tenant===t.businessName?'selected':''}>${Utils.escapeHtml(t.businessName)}</option>`).join('');
         App.showModal('Edit Space', `
             <div class="grid-2">
                 <div class="form-group"><label>Unit Name</label><input type="text" class="form-input" id="spName" value="${Utils.escapeHtml(s.name)}" required></div>
@@ -80,7 +81,7 @@ const Commercial = {
                 <div class="form-group"><label>Area</label><input type="number" class="form-input" id="spArea" value="${s.area}"></div>
                 <div class="form-group"><label>Rate</label><input type="number" class="form-input" id="spRate" value="${s.monthlyRate}"></div>
                 <div class="form-group"><label>Status</label><select class="form-input" id="spStatus"><option value="vacant" ${s.status==='vacant'?'selected':''}>Vacant</option><option value="occupied" ${s.status==='occupied'?'selected':''}>Occupied</option><option value="maintenance" ${s.status==='maintenance'?'selected':''}>Maintenance</option></select></div>
-                <div class="form-group"><label>Tenant</label><input type="text" class="form-input" id="spTenant" value="${Utils.escapeHtml(s.tenant||'')}"></div>
+                <div class="form-group"><label>Tenant</label><select class="form-input" id="spTenant"><option value="">— No Tenant —</option>${tenantOpts}</select></div>
             </div>`,
             `<button class="btn btn-secondary" onclick="App.closeModal()">Cancel</button>
              <button class="btn btn-primary" onclick="Commercial.updateSpace('${id}')">Update</button>`

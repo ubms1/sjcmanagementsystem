@@ -108,9 +108,10 @@ const Crushing = {
     },
 
     addOrder() {
+        const custOpts = DataStore.customers.map(c=>`<option value="${Utils.escapeHtml(c.name)}">${Utils.escapeHtml(c.name)}</option>`).join('');
         App.showModal('New Order', `
             <div class="grid-2">
-                <div class="form-group"><label>Customer</label><input type="text" class="form-input" id="coCustomer" required></div>
+                <div class="form-group"><label>Customer</label><select class="form-input" id="coCustomer" required><option value="">— Select Customer —</option>${custOpts}</select></div>
                 <div class="form-group"><label>Product</label><select class="form-input" id="coProduct" onchange="Crushing.updateOrderTotal()">${DataStore.aggregateProducts.map(p=>`<option value="${p.id}" data-price="${p.price}" data-unit="${p.unit}">${p.name} (₱${p.price}/${p.unit})</option>`).join('')}</select></div>
                 <div class="form-group"><label>Quantity</label><input type="number" class="form-input" id="coQty" min="1" value="1" onchange="Crushing.updateOrderTotal()"></div>
                 <div class="form-group"><label>Total Amount (₱)</label><input type="number" class="form-input" id="coTotal" readonly></div>

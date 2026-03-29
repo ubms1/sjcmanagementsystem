@@ -39,7 +39,7 @@ const CRM = {
                     { label: 'Phone', render: r => r.phone || '-' },
                     { label: 'Type', render: r => `<span class="badge-tag ${r.type==='lead'?'badge-warning':'badge-primary'}">${r.type}</span>` },
                     { label: 'Status', render: r => `<span class="badge-tag ${Utils.getStatusClass(r.status)}">${r.status}</span>` },
-                    { label: 'Actions', render: r => `<button class="btn btn-sm" onclick="CRM.editCustomer('${r.id}')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-primary" onclick="CRM.logInteraction('${r.id}')" title="Log Interaction"><i class="fas fa-comment-dots"></i></button> <button class="btn btn-sm btn-success" onclick="CRM.createInvoiceFor('${r.id}')" title="Create Invoice"><i class="fas fa-file-invoice-dollar"></i></button>` }
+                    { label: 'Actions', render: r => `<button class="btn btn-sm" onclick="CRM.editCustomer('${r.id}')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-info" onclick="CRM.viewHistory('${r.id}')" title="View History"><i class="fas fa-history"></i></button> <button class="btn btn-sm btn-primary" onclick="CRM.logInteraction('${r.id}')" title="Log Interaction"><i class="fas fa-comment-dots"></i></button> <button class="btn btn-sm btn-success" onclick="CRM.createInvoiceFor('${r.id}')" title="Create Invoice"><i class="fas fa-file-invoice-dollar"></i></button>` }
                 ], customers)}
             </div></div>
         </div>
@@ -150,6 +150,58 @@ const CRM = {
         App.navigate('invoicing');
         // Slight delay to let the invoicing module render before opening the modal
         setTimeout(() => Invoicing.createInvoice(c.name, c.address || ''), 250);
+    },
+
+    viewHistory(customerId) {
+        const c = (DataStore.customers || []).find(x => x.id === customerId);
+        if (!c) return;
+        const invoices = (DataStore.invoices || []).filter(i => i.client === c.name);
+        const interactions = (DataStore.interactions || []).filter(i => i.customerId === customerId);
+        const crushOrders = (DataStore.crushingOrders || []).filter(o => o.customer === c.name);
+        const testOrders = (DataStore.testOrders || []).filter(o => o.client === c.name);
+        const projects = (DataStore.projects || []).filter(p => p.client === c.name);
+
+        const invHtml = invoices.length ? Utils.buildTable([
+            { label: 'Invoice', render: r => `<strong>${r.id}</strong>` },
+            { label: 'Amount', render: r => Utils.formatCurrency(r.amount) },
+            { label: 'Status', render: r => `<span class="badge-tag ${Utils.getStatusClass(r.status)}">${r.status}</span>` },
+            { label: 'Date', render: r => Utils.formatDate(r.date || r.createdAt) }
+        ], invoices) : '<p class="text-muted">No invoices found.</p>';
+
+        const intHtml = interactions.length ? Utils.buildTable([
+            { label: 'Type', render: r => r.type },
+            { label: 'Subject', render: r => Utils.escapeHtml(r.subject || '-') },
+            { label: 'Date', render: r => Utils.formatDate(r.date) }
+        ], interactions) : '<p class="text-muted">No interactions logged.</p>';
+
+        const crushHtml = crushOrders.length ? Utils.buildTable([
+            { label: 'Order', render: r => `<strong>${r.id}</strong>` },
+            { label: 'Product', render: r => Utils.escapeHtml(r.productName || '-') },
+            { label: 'Amount', render: r => Utils.formatCurrency(r.totalAmount) },
+            { label: 'Status', render: r => `<span class="badge-tag ${Utils.getStatusClass(r.status)}">${r.status}</span>` }
+        ], crushOrders) : '';
+
+        const testHtml = testOrders.length ? Utils.buildTable([
+            { label: 'Order', render: r => `<strong>${r.id}</strong>` },
+            { label: 'Test', render: r => { const t = DataStore.testServices.find(s=>s.id===r.testServiceId); return t ? Utils.escapeHtml(t.name) : r.testServiceId; }},
+            { label: 'Amount', render: r => Utils.formatCurrency(r.totalCost) },
+            { label: 'Status', render: r => `<span class="badge-tag ${Utils.getStatusClass(r.status)}">${r.status}</span>` }
+        ], testOrders) : '';
+
+        const projHtml = projects.length ? Utils.buildTable([
+            { label: 'Project', render: r => `<strong>${Utils.escapeHtml(r.name)}</strong>` },
+            { label: 'Budget', render: r => Utils.formatCurrency(r.budget) },
+            { label: 'Status', render: r => `<span class="badge-tag ${Utils.getStatusClass(r.status)}">${r.status}</span>` }
+        ], projects) : '';
+
+        App.showModal(`Customer History — ${Utils.escapeHtml(c.name)}`, `
+            <div class="mb-3"><strong>Company:</strong> ${Utils.escapeHtml(c.company || '-')} &nbsp;|&nbsp; <strong>Contact:</strong> ${Utils.escapeHtml(c.phone || '-')} &nbsp;|&nbsp; <strong>Email:</strong> ${Utils.escapeHtml(c.email || '-')}</div>
+            <h4 class="mb-1"><i class="fas fa-file-invoice-dollar"></i> Invoices (${invoices.length})</h4>${invHtml}
+            ${crushOrders.length ? `<h4 class="mt-3 mb-1"><i class="fas fa-truck"></i> Quarry Orders (${crushOrders.length})</h4>${crushHtml}` : ''}
+            ${testOrders.length ? `<h4 class="mt-3 mb-1"><i class="fas fa-flask"></i> Test Orders (${testOrders.length})</h4>${testHtml}` : ''}
+            ${projects.length ? `<h4 class="mt-3 mb-1"><i class="fas fa-hard-hat"></i> Projects (${projects.length})</h4>${projHtml}` : ''}
+            <h4 class="mt-3 mb-1"><i class="fas fa-comments"></i> Interactions (${interactions.length})</h4>${intHtml}
+        `);
     },
 
     saveInteraction(customerId) {

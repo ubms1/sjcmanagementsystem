@@ -259,8 +259,8 @@ const DataStore = {
         const filter = (items) => company === 'all' ? items : items.filter(i => (i.companyId || i.company) === company);
         const invs = filter(this.invoices);
         const exps = filter(this.expenses);
-        const totalRevenue = invs.reduce((s, i) => s + (i.paid || 0), 0);
-        const totalReceivable = invs.reduce((s, i) => s + ((i.amount || 0) - (i.paid || 0)), 0);
+        const totalRevenue = invs.filter(i => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0);
+        const totalReceivable = invs.filter(i => i.status !== 'paid' && i.status !== 'cancelled').reduce((s, i) => s + (i.amount || 0), 0);
         const totalExpenses = exps.reduce((s, e) => s + (e.amount || 0), 0);
         return {
             totalRevenue, totalReceivable, totalExpenses,

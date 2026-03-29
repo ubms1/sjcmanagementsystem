@@ -258,18 +258,34 @@ const Subdivision = {
         const lotId = document.getElementById('payLot')?.value;
         const amount = parseFloat(document.getElementById('payAmount')?.value);
         if (!lotId || !amount) { App.showToast('Lot and amount are required', 'error'); return; }
+        const payDate = document.getElementById('payDate')?.value || new Date().toISOString().split('T')[0];
+        const payer = document.getElementById('payPayer')?.value?.trim() || '';
+        const reference = document.getElementById('payRef')?.value?.trim() || '';
         DataStore.lotPayments.push({
             id: Utils.generateId('LPAY'),
-            lotId,
-            amount,
-            date: document.getElementById('payDate')?.value || new Date().toISOString().split('T')[0],
+            lotId, amount, date: payDate,
             method: document.getElementById('payMethod')?.value || 'Cash',
-            payer: document.getElementById('payPayer')?.value?.trim() || '',
-            reference: document.getElementById('payRef')?.value?.trim() || ''
+            payer, reference
+        });
+        // Auto-create invoice for lot payment
+        const lot = DataStore.lots.find(l => l.id === lotId);
+        const lotLabel = lot ? `B${lot.block}-L${lot.lot}` : lotId;
+        DataStore.invoices.push({
+            id: Utils.generateId('INV'),
+            companyId: 'erlandia',
+            client: payer || (lot?.buyer || 'Lot Buyer'),
+            address: '',
+            items: [{ description: `Lot Payment — ${lotLabel}`, qty: 1, price: amount, amount }],
+            amount,
+            status: 'paid',
+            date: payDate,
+            dueDate: payDate,
+            reference,
+            createdAt: new Date().toISOString()
         });
         Database.save();
         App.closeModal();
-        App.showToast('Payment recorded');
+        App.showToast('Payment recorded and invoice created');
         this.renderPayments(document.getElementById('mainContent'));
     },
 

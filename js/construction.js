@@ -35,11 +35,12 @@ const Construction = {
 
     addProject() {
         const company = App.activeCompany === 'all' ? 'sjc' : App.activeCompany;
+        const custOpts = DataStore.customers.map(c=>`<option value="${Utils.escapeHtml(c.name)}">${Utils.escapeHtml(c.name)}</option>`).join('');
         App.showModal('New Project', `
             <form id="projectForm">
                 <div class="grid-2">
                     <div class="form-group"><label>Project Name</label><input type="text" class="form-input" id="pName" required></div>
-                    <div class="form-group"><label>Client</label><input type="text" class="form-input" id="pClient"></div>
+                    <div class="form-group"><label>Client</label><select class="form-input" id="pClient"><option value="">— Select Client —</option>${custOpts}</select></div>
                     <div class="form-group"><label>Location</label><input type="text" class="form-input" id="pLocation"></div>
                     <div class="form-group"><label>Budget (₱)</label><input type="number" class="form-input" id="pBudget" min="0"></div>
                     <div class="form-group"><label>Start Date</label><input type="date" class="form-input" id="pStart"></div>
@@ -82,11 +83,12 @@ const Construction = {
     editProject(id) {
         const p = DataStore.projects.find(pr => pr.id === id);
         if (!p) return;
+        const custOpts = DataStore.customers.map(c=>`<option value="${Utils.escapeHtml(c.name)}" ${p.client===c.name?'selected':''}>${Utils.escapeHtml(c.name)}</option>`).join('');
         App.showModal('Edit Project', `
             <form id="projectForm">
                 <div class="grid-2">
                     <div class="form-group"><label>Project Name</label><input type="text" class="form-input" id="pName" value="${Utils.escapeHtml(p.name)}" required></div>
-                    <div class="form-group"><label>Client</label><input type="text" class="form-input" id="pClient" value="${Utils.escapeHtml(p.client||'')}"></div>
+                    <div class="form-group"><label>Client</label><select class="form-input" id="pClient"><option value="">— Select Client —</option>${custOpts}</select></div>
                     <div class="form-group"><label>Location</label><input type="text" class="form-input" id="pLocation" value="${Utils.escapeHtml(p.location||'')}"></div>
                     <div class="form-group"><label>Budget (₱)</label><input type="number" class="form-input" id="pBudget" value="${p.budget}" min="0"></div>
                     <div class="form-group"><label>Start Date</label><input type="date" class="form-input" id="pStart" value="${p.startDate}"></div>

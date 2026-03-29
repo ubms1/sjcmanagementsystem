@@ -63,9 +63,10 @@ const TestingLab = {
     },
 
     addOrder() {
+        const custOpts = DataStore.customers.map(c=>`<option value="${Utils.escapeHtml(c.name)}">${Utils.escapeHtml(c.name)}</option>`).join('');
         App.showModal('New Test Order', `
             <div class="grid-2">
-                <div class="form-group"><label>Client Name</label><input type="text" class="form-input" id="toClient" required></div>
+                <div class="form-group"><label>Client</label><select class="form-input" id="toClient" required><option value="">— Select Client —</option>${custOpts}</select></div>
                 <div class="form-group"><label>Project Name</label><input type="text" class="form-input" id="toProject"></div>
                 <div class="form-group"><label>Test Service</label><select class="form-input" id="toService" onchange="TestingLab.updateCost()">${DataStore.testServices.map(s=>`<option value="${s.id}" data-price="${s.price}">${s.name} (₱${s.price})</option>`).join('')}</select></div>
                 <div class="form-group"><label>Number of Samples</label><input type="number" class="form-input" id="toSamples" min="1" value="1" onchange="TestingLab.updateCost()"></div>
