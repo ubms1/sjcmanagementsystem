@@ -103,7 +103,7 @@ const Settings = {
         );
     },
 
-    savePassword() {
+    async savePassword() {
         const current = document.getElementById('cpCurrent')?.value;
         const newPw = document.getElementById('cpNew')?.value;
         const confirm = document.getElementById('cpConfirm')?.value;
@@ -112,8 +112,16 @@ const Settings = {
         if (newPw.length < 6) { App.showToast('Password must be at least 6 characters', 'error'); return; }
         const session = Auth.getSession();
         const user = DataStore.users?.find(u => u.username === session?.username);
-        if (!user || user.password !== current) { App.showToast('Current password incorrect', 'error'); return; }
-        user.password = newPw;
+        if (!user) { App.showToast('User not found', 'error'); return; }
+        // Compare hashed current password
+        const currentHash = await Database.hashPassword(current);
+        const storedHash = user.passwordHash || '';
+        // Also allow plaintext fallback (legacy users not yet migrated)
+        const match = (storedHash && currentHash === storedHash) || (!user.passwordHash && user.password === current);
+        if (!match) { App.showToast('Current password incorrect', 'error'); return; }
+        // Store as hash, remove any legacy plaintext
+        user.passwordHash = await Database.hashPassword(newPw);
+        delete user.password;
         Database.save(); App.closeModal(); App.showToast('Password changed successfully');
     },
 

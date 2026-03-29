@@ -135,7 +135,7 @@ const Notifications = {
         const badge = document.getElementById('notifBadge');
         if (badge) {
             badge.textContent = unread > 99 ? '99+' : String(unread);
-            badge.style.display = unread > 0 ? 'flex' : 'none';
+            badge.classList.toggle('hidden', unread === 0);
         }
     },
 

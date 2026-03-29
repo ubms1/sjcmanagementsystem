@@ -87,8 +87,6 @@ const DataStore = {
     invoices: [],
     expenses: [],
     journalEntries: [],
-    interactions: [],
-    isoCAPAs: [],
 
     // ============================================================
     //  CONSTRUCTION - PROJECTS (SJC)
