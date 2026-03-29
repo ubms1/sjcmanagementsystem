@@ -255,6 +255,7 @@ const App = {
                 case 'financial': if (typeof Financial !== 'undefined') Financial.render(main); break;
                 case 'reports': if (typeof Reports !== 'undefined') Reports.render(main); break;
                 case 'financial-analysis': if (typeof FinancialAnalysis !== 'undefined') FinancialAnalysis.render(main); break;
+                case 'catalog': if (typeof Catalog !== 'undefined') Catalog.render(main); break;
                 case 'invoicing': if (typeof Invoicing !== 'undefined') Invoicing.render(main); break;
                 case 'payroll': if (typeof Payroll !== 'undefined') Payroll.render(main); break;
                 case 'inventory': if (typeof Inventory !== 'undefined') Inventory.render(main); break;

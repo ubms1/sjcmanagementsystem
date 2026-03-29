@@ -70,11 +70,30 @@ const POS = {
         } else if (type === 'testing_lab') {
             products = (DataStore.testServices || []).map(s => ({ id: s.id, name: s.name, price: s.price, unit: 'test', category: s.category }));
         } else {
-            products = [
-                { id: 'svc-001', name: 'General Service', price: 1000, unit: 'service', category: 'Services' },
-                { id: 'svc-002', name: 'Consultation', price: 2500, unit: 'session', category: 'Services' },
-                { id: 'svc-003', name: 'Project Estimate', price: 5000, unit: 'estimate', category: 'Services' }
-            ];
+            // Use catalog items for this company type, falling back to generic if none exist
+            const company = App.currentCompany;
+            const catalogItems = typeof Catalog !== 'undefined'
+                ? Catalog.getForCompany(company)
+                : [];
+            if (catalogItems.length > 0) {
+                products = catalogItems.map(i => ({ id: i.id, name: i.name, price: i.price, unit: i.unit, category: i.category }));
+            } else {
+                products = [
+                    { id: 'svc-001', name: 'General Service', price: 1000, unit: 'service', category: 'Services' },
+                    { id: 'svc-002', name: 'Consultation', price: 2500, unit: 'session', category: 'Services' },
+                    { id: 'svc-003', name: 'Project Estimate', price: 5000, unit: 'estimate', category: 'Services' }
+                ];
+            }
+        }
+        // Also merge any catalog items for this company (in addition to source-specific products)
+        if (type !== 'quarry' && type !== 'driving_school' && type !== 'testing_lab') {
+            // Already handled above
+        } else if (typeof Catalog !== 'undefined') {
+            const company = App.currentCompany;
+            const extraCatalog = (DataStore.catalog || []).filter(c =>
+                (c.companyId === company || c.companyId === 'all') && c.active !== false
+            ).map(c => ({ id: c.id, name: c.name, price: c.price, unit: c.unit || 'service', category: c.category || 'General' }));
+            products = [...products, ...extraCatalog];
         }
         if (products.length === 0) return '<div class="empty-state pos-empty"><p>No products available for this company type.</p></div>';
         return products.map(p => `

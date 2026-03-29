@@ -79,6 +79,7 @@ const Invoicing = {
                 </div>
             </div>
             <button class="btn btn-sm" onclick="Invoicing.addLineItem()"><i class="fas fa-plus"></i> Add Line</button>
+            <button class="btn btn-sm btn-secondary" onclick="Invoicing.pickFromCatalog()" style="margin-left:6px"><i class="fas fa-box-open"></i> Pick from Catalog</button>
             <div class="inv-form-total">Total: ₱<span id="invTotal">0.00</span></div>`,
             `<button class="btn btn-secondary" onclick="App.closeModal()">Cancel</button>
              <button class="btn btn-primary" onclick="Invoicing.saveInvoice()">Create Invoice</button>`
@@ -118,6 +119,38 @@ const Invoicing = {
             <div class="form-group"><input type="number" class="form-input inv-item-qty" min="1" value="1" onchange="Invoicing.calcTotal()"></div>
             <div class="form-group"><input type="number" class="form-input inv-item-price" min="0" step="0.01" onchange="Invoicing.calcTotal()"></div>`;
         container.appendChild(row);
+    },
+
+    pickFromCatalog() {
+        if (typeof Catalog === 'undefined') { App.showToast('Catalog module not loaded', 'error'); return; }
+        const companyId = App.currentCompany;
+        Catalog.openPickerModal('Invoicing.addLineFromCatalog', companyId);
+    },
+
+    addLineFromCatalog(id, name, price, unit) {
+        App.closeModal();
+        const container = document.getElementById('invItems');
+        if (!container) return;
+        // Try to fill in first empty line item
+        const descs = container.querySelectorAll('.inv-item-desc');
+        const prices = container.querySelectorAll('.inv-item-price');
+        for (let i = 0; i < descs.length; i++) {
+            if (!descs[i].value) {
+                descs[i].value = name;
+                if (prices[i]) { prices[i].value = price; }
+                Invoicing.calcTotal();
+                return;
+            }
+        }
+        // Otherwise add new line
+        const row = document.createElement('div');
+        row.className = 'grid-3 inv-line-row';
+        row.innerHTML = `
+            <div class="form-group"><input type="text" class="form-input inv-item-desc" value="${Utils.escapeHtml(name)}"></div>
+            <div class="form-group"><input type="number" class="form-input inv-item-qty" min="1" value="1" onchange="Invoicing.calcTotal()"></div>
+            <div class="form-group"><input type="number" class="form-input inv-item-price" min="0" step="0.01" value="${price}" onchange="Invoicing.calcTotal()"></div>`;
+        container.appendChild(row);
+        Invoicing.calcTotal();
     },
 
     calcTotal() {
